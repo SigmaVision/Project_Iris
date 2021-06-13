@@ -1,38 +1,26 @@
 import cv2 as cv
 
 ##########################################################
-# METHODS
+# FUNCTIONS
 ##########################################################
 
-def read_image(name):
-    '''
-    (str) -> rgb_matrix
-
-    Returns a copy of the file
-    '''
+def read_image(name: str):
+    'Returns a copy of the file'
     image = cv.imread(name)
     print(name," - ",image.shape)
     display(image, 2000,'Initial Image')
     return image
 
 
-def display(image, time=2000, title = 'Image') -> None:
-    '''
-    (rgb_matrix, int, str) -> None
-    
-    Display the image for a certain number of milliseconds
-    '''
+def display(image, time: int = 2000, title: str = 'Image') -> None:
+    'Display the image for a certain number of milliseconds'
     cv.imshow(title,image)
     cv.waitKey(time)
     cv.destroyWindow(title)
 
 
-def isolate_pupil(image,threshold):
-    '''
-    (rgb_matrix, int) -> rgb_matrix
-
-    Binarize value based on if it is below the threshold or not
-    '''
+def isolate_pupil(image,threshold: int):
+    'Binarize value based on if it is below the threshold or not'
     x,y,c=image.shape
     for i in range(0,x):
         for j in range(0,y):
@@ -46,11 +34,7 @@ def isolate_pupil(image,threshold):
 
 
 def center_mass(image) -> tuple:
-    '''
-    (rgb_matrix) -> (int, int)
-    
-    Find x, y coordinate of the center of mass
-    '''
+    'Find x, y coordinate of the center of mass'
     sum_i = sum_j = 0
     total = 0
     x,y,c=image.shape
@@ -65,12 +49,8 @@ def center_mass(image) -> tuple:
     return (sum_i//total, sum_j//total)
 
 
-def add_center(image,size):
-    '''
-    (rgb_matrix, int) -> rgb_matrix
-
-    Returns an image with a red square around it's center of mass
-    '''
+def add_center(image,size:int):
+    "Returns an image with a red square around it's center of mass"
     x,y=center_mass(image)
     for i in range(x-size,x+size):
         for j in range(y-size,y+size):
@@ -82,7 +62,7 @@ def avg_luminance(image):
     pass
 
 
-def threshold():
+def threshold() -> int:
     pass
 
 
