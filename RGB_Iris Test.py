@@ -64,21 +64,31 @@ def avg_luminance(image):
 ##########################################################
 # MAIN
 ##########################################################
-print("Do you want to run the program? (yes or no) /n")
-run_program = input().strip()
+
+run_program = 'yes'
+
 while run_program == 'yes':
-    print("Which image do you want to process? /n")
+
+    # Read Image
+    print("Which image do you want to process?")
     name=input().strip()
-    
     image = read_image(name)
 
-    print("what is the threshold you want to try? /n")
+    # Binarize based on Threshold
+    print("what is the threshold you want to try?")
     threshold=int(input().strip())
     new_img = isolate_pupil(image,threshold)
+    display(new_img,2000,'After Binarization')
 
-    display(new_img,50,'final')
+    # Blur to remove noise
+    blurred = cv.medianBlur(image,5)
+    display(blurred,2000,'Blurred')
 
-    print(center_mass(new_img))
+    # Find and display center of mass
+    print(center_mass(blurred))
+    center = add_center(blurred,5)
+    display(center,2000,'Center added')
 
-    print("Do you want to continue the program? (yes or no) /n")
+    # Ask user if he wishes to continue
+    print("Do you want to continue the program? (yes or no)")
     run_program = input().strip()
