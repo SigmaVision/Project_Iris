@@ -7,11 +7,11 @@ import cv2 as cv
 def read_image(name):
     image = cv.imread(name)
     print(name," - ",image.shape)
-    display(image, 20,'Initial Image')
+    display(image, 2000,'Initial Image')
     return image
 
 
-def display(image, time=100, title = 'Image'):
+def display(image, time=2000, title = 'Image'):
     cv.imshow(title,image)
     cv.waitKey(time)
 
