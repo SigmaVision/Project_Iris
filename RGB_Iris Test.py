@@ -86,7 +86,7 @@ while run_program == 'yes':
     display(new_img,2000,'After Binarization')
 
     # Blur to remove noise
-    blurred = cv.medianBlur(image,5)
+    blurred = cv.medianBlur(new_img,5)
     display(blurred,2000,'Blurred')
 
     # Find and display center of mass
