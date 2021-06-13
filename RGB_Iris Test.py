@@ -16,7 +16,7 @@ def read_image(name):
     return image
 
 
-def display(image, time=2000, title = 'Image'):
+def display(image, time=2000, title = 'Image') -> None:
     '''
     (rgb_matrix, int, str) -> None
     
@@ -44,7 +44,8 @@ def isolate_pupil(image,threshold):
 
     return image
 
-def center_mass(image):
+
+def center_mass(image) -> tuple:
     '''
     (rgb_matrix) -> (int, int)
     
@@ -61,13 +62,14 @@ def center_mass(image):
                 sum_j+=j
                 total+=1
 
-    return (sum_i//total,sum_j//total)
+    return (sum_i//total, sum_j//total)
+
 
 def add_center(image,size):
     '''
     (rgb_matrix, int) -> rgb_matrix
 
-    Returns an image with a blue square around it's center of mass
+    Returns an image with a red square around it's center of mass
     '''
     x,y=center_mass(image)
     for i in range(x-size,x+size):
@@ -78,6 +80,11 @@ def add_center(image,size):
 
 def avg_luminance(image):
     pass
+
+
+def threshold():
+    pass
+
 
 ##########################################################
 # MAIN
