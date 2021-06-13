@@ -45,6 +45,19 @@ def center_mass(image):
 
     return (sum_i//total,sum_j//total)
 
+def add_center(image,size):
+    '''
+    (rgb_matrix, int) -> rgb_matrix
+
+    Returns an image with a blue square around it's center of mass
+    '''
+    x,y=center_mass(image)
+    for i in range(x-size,x+size):
+        for j in range(y-size,y+size):
+            image[i,j]=[0,0,255]
+    return image
+
+
 def avg_luminance(image):
     pass
 
