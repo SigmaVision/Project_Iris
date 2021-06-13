@@ -32,7 +32,18 @@ def isolate_pupil(image,threshold):
     return image
 
 def center_mass(image):
-    pass
+    sum_i = sum_j = 0
+    total = 0
+    x,y,c=image.shape
+    for i in range(0,x):
+        for j in range(0,y):
+
+            if  image[i,j][0] == 0:
+                sum_i+=i
+                sum_j+=j
+                total+=1
+
+    return (sum_i//total,sum_j//total)
 
 def avg_luminance(image):
     pass
@@ -53,6 +64,8 @@ while run_program == 'yes':
     new_img = isolate_pupil(image,threshold)
 
     display(new_img,50,'final')
+
+    print(center_mass(new_img))
 
     print("Do you want to continue the program? (yes or no) /n")
     run_program = input().strip()
