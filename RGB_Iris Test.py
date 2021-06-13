@@ -5,6 +5,11 @@ import cv2 as cv
 ##########################################################
 
 def read_image(name):
+    '''
+    (str) -> rgb_matrix
+
+    Returns a copy of the file
+    '''
     image = cv.imread(name)
     print(name," - ",image.shape)
     display(image, 2000,'Initial Image')
@@ -12,12 +17,20 @@ def read_image(name):
 
 
 def display(image, time=2000, title = 'Image'):
+    '''
+    (rgb_matrix, int, str) -> None
+    
+    Display the image for a certain number of milliseconds
+    '''
     cv.imshow(title,image)
     cv.waitKey(time)
+    cv.destroyWindow(title)
 
 
 def isolate_pupil(image,threshold):
-    '''(rgb_matrix, int) -> rgb_matrix
+    '''
+    (rgb_matrix, int) -> rgb_matrix
+
     Binarize value based on if it is below the threshold or not
     '''
     x,y,c=image.shape
@@ -32,6 +45,11 @@ def isolate_pupil(image,threshold):
     return image
 
 def center_mass(image):
+    '''
+    (rgb_matrix) -> (int, int)
+    
+    Find x, y coordinate of the center of mass
+    '''
     sum_i = sum_j = 0
     total = 0
     x,y,c=image.shape
