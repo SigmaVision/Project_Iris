@@ -24,8 +24,8 @@ def isolate_pupil(image,threshold: int):
     x,y,c=image.shape
     for i in range(0,x):
         for j in range(0,y):
-
-            if not(image[i,j][0] < threshold and image[i,j][1] < threshold and image[i,j][2] < threshold):
+            filteredThreshold = ((((i - (x // 2)) // 20) * 2) * (((j - (y // 2)) // 20) * 2)) + threshold
+            if not(image[i,j][0] < filteredThreshold and image[i,j][1] < filteredThreshold and image[i,j][2] < filteredThreshold):
                 image[i,j]=[255,255,255]
             else:
                 image[i,j]=[0,0,0]
