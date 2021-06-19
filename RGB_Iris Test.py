@@ -32,6 +32,16 @@ def isolate_pupil(image,threshold: int):
 
     return image
 
+def clean_pupil(image, centerX, centerY):
+    x, y, c = image.shape
+    rand = 43
+    for i in range(0, x):
+        for j in range(0, y):
+            if abs(i-centerX) > rand or abs(j-centerY) > rand:
+                image[i, j] = [255, 255, 255]
+            else:
+                continue
+    return image
 
 def center_mass(image) -> tuple:
     'Find x, y coordinate of the center of mass'
@@ -58,12 +68,20 @@ def add_center(image,size:int):
     return image
 
 
+
 def avg_luminance(image):
-    pass
+    sum = 0
+    count = 0
+    x, y, c = image.shape
+    for i in range(0, x):
+        for j in range(0, y):
+            r, g, b = image[i, j][2], image[i, j][1], image[i, j][0]
+            brightness = (r + g + b) // 3
+            sum += brightness
+            count += 1
+    print(sum // count)
+    return sum // count
 
-
-def threshold() -> int:
-    pass
 
 
 ##########################################################
@@ -73,26 +91,30 @@ def threshold() -> int:
 run_program = 'yes'
 
 while run_program == 'yes':
-
     # Read Image
     print("Which image do you want to process?")
-    name=input().strip()
+    name = input().strip()
     image = read_image(name)
 
     # Binarize based on Threshold
-    print("what is the threshold you want to try?")
-    threshold=int(input().strip())
-    new_img = isolate_pupil(image,threshold)
-    display(new_img,2000,'After Binarization')
+    # print("what is the threshold you want to try?")-+++
+    #
+    threshold = avg_luminance(image)
+    new_img = isolate_pupil(image, threshold)
+    display(new_img, 2000, 'After Binarization')
 
     # Blur to remove noise
-    blurred = cv.medianBlur(new_img,5)
-    display(blurred,2000,'Blurred')
+    blurred = cv.medianBlur(image, 5)
+    display(blurred, 2000, 'Blurred')
 
     # Find and display center of mass
     print(center_mass(blurred))
-    center = add_center(blurred,5)
-    display(center,2000,'Center added')
+    center = add_center(blurred, 5)
+    display(center, 2000, 'Center added')
+
+    # clean pupil
+    centerX, centerY = center_mass(blurred)
+    display(clean_pupil(blurred, centerX, centerY), 2000, 'Cleaned')
 
     # Ask user if he wishes to continue
     print("Do you want to continue the program? (yes or no)")
