@@ -1,5 +1,6 @@
 import cv2 as cv
 
+
 ##########################################################
 # FUNCTIONS
 ##########################################################
@@ -7,66 +8,69 @@ import cv2 as cv
 def read_image(name: str):
     'Returns a copy of the file'
     image = cv.imread(name)
-    print(name," - ",image.shape)
-    display(image, 2000,'Initial Image')
+    print(name, " - ", image.shape)
+    display(image, 2000, 'Initial Image')
     return image
 
 
 def display(image, time: int = 2000, title: str = 'Image') -> None:
     'Display the image for a certain number of milliseconds'
-    cv.imshow(title,image)
+    cv.imshow(title, image)
     cv.waitKey(time)
     cv.destroyWindow(title)
 
 
-def isolate_pupil(image,threshold: int):
+def isolate_pupil(image, threshold: int):
     'Binarize value based on if it is below the threshold or not'
-    x,y,c=image.shape
-    for i in range(0,x):
-        for j in range(0,y):
-            filteredThreshold = ((((i - (x // 2)) // 20) * 2) * (((j - (y // 2)) // 20) * 2)) + threshold
-            if not(image[i,j][0] < filteredThreshold and image[i,j][1] < filteredThreshold and image[i,j][2] < filteredThreshold):
-                image[i,j]=[255,255,255]
+    # ((((i - (x // 2)) // 20) * 2) * (((j - (y // 2)) // 20) * 2))
+    x, y, c = image.shape
+    for i in range(0, x):
+        for j in range(0, y):
+            filteredThreshold = threshold
+            if not (image[i, j][0] < filteredThreshold and image[i, j][1] < filteredThreshold and image[i, j][
+                2] < filteredThreshold):
+                image[i, j] = [255, 255, 255]
             else:
-                image[i,j]=[0,0,0]
+                image[i, j] = [0, 0, 0]
 
     return image
+
 
 def clean_pupil(image, centerX, centerY):
     x, y, c = image.shape
     rand = 43
     for i in range(0, x):
         for j in range(0, y):
-            if abs(i-centerX) > rand or abs(j-centerY) > rand:
+            if abs(i - centerX) > rand or abs(j - centerY) > rand:
                 image[i, j] = [255, 255, 255]
             else:
                 continue
     return image
 
+
 def center_mass(image) -> tuple:
     'Find x, y coordinate of the center of mass'
     sum_i = sum_j = 0
     total = 0
-    x,y,c=image.shape
-    for i in range(0,x):
-        for j in range(0,y):
+    x, y, c = image.shape
+    for i in range(0, x):
+        for j in range(0, y):
 
-            if  image[i,j][0] == 0:
-                sum_i+=i
-                sum_j+=j
-                total+=1
+            if image[i, j][0] == 0:
+                sum_i += i
+                sum_j += j
+                total += 1
 
-    return (sum_i//total, sum_j//total)
+    return (sum_i // total, sum_j // total)
 
 
-def add_center(image,size:int):
+def add_center(image, size: int):
     "Returns an image with a red square around it's center of mass"
-    x,y=center_mass(image)
-    for i in range(x-size,x+size):
-        for j in range(y-size,y+size):
-            image[i,j]=[0,0,255]
+    x, y = center_mass(image)
+    for i in range(x - size, x + size):
+        for j in range(y - size, y + size):
+            image[i, j] = [0, 0, 255]
     return image
-
 
 
 def avg_luminance(image):
@@ -81,7 +85,6 @@ def avg_luminance(image):
             count += 1
     print(sum // count)
     return sum // count
-
 
 
 ##########################################################
