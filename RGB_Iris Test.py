@@ -17,17 +17,19 @@ def display(image, time: int = 2000, title: str = 'Image') -> None:
     'Display the image for a certain number of milliseconds'
     cv.imshow(title, image)
     cv.waitKey(time)
-    cv.destroyWindow(title)
+    # cv.destroyWindow(title)
 
 
 def isolate_pupil(image, threshold: int):
     'Binarize value based on if it is below the threshold or not'
-    x,y,c=image.shape
-    for i in range(0,x):
-        for j in range(0,y):
-            filteredThreshold = (-(i - (x // 2))//x*2 ** 2+1) * (-(j - (y // 2))*2//x ** 2+1) * threshold
-            if image[i,j][0] > filteredThreshold or image[i,j][1] > filteredThreshold or image[i,j][2] > filteredThreshold:
-                image[i,j]=[255,255,255]
+    # (-(i - (x // 2))//x*2 ** 2+1) * (-(j - (y // 2))*2//x ** 2+1)
+    x, y, c = image.shape
+    for i in range(0, x):
+        for j in range(0, y):
+            filteredThreshold = threshold
+            if image[i, j][0] > filteredThreshold or image[i, j][1] > filteredThreshold or image[i, j][
+                2] > filteredThreshold:
+                image[i, j] = [255, 255, 255]
             else:
                 image[i, j] = [0, 0, 0]
 
@@ -85,12 +87,16 @@ def avg_luminance(image):
     return sum // count
 
 
-def fill_pupil():
-    pass
+def fill_pupil(image):
+    gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+    ret, thresh = cv.threshold(gray, 0, 255, cv.THRESH_BINARY)
+    contours, hierarchy = cv.findContours(thresh, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    cv.drawContours(image, contours, 1, (0, 0, 0), thickness=-1)
 
 
-def shape_pupil():
-    pass
+def shape_pupil(image, centerX, centerY):
+    # need to find the radius first
+    cv.circle(image, (centerY, centerX), 25, (0, 255, 0), thickness=2)
 
 
 ##########################################################
@@ -106,8 +112,6 @@ while run_program == 'yes':
     image = read_image(name)
 
     # Binarize based on Threshold
-    # print("what is the threshold you want to try?")-+++
-    #
     threshold = avg_luminance(image)
     new_img = isolate_pupil(image, threshold)
     display(new_img, 2000, 'After Binarization')
@@ -116,14 +120,20 @@ while run_program == 'yes':
     blurred = cv.medianBlur(image, 5)
     display(blurred, 2000, 'Blurred')
 
-    # Find and display center of mass
-    print(center_mass(blurred))
-    center = add_center(blurred, 5)
-    display(center, 2000, 'Center added')
-
     # clean pupil
     centerX, centerY = center_mass(blurred)
-    display(clean_pupil(blurred, centerX, centerY), 2000, 'Cleaned')
+    cleaned = clean_pupil(blurred, centerX, centerY)
+    display(cleaned, 2000, 'Cleaned')
+    print(center_mass(blurred))
+
+    # fill pupil
+    fill_pupil(cleaned)
+    display(cleaned, 2000, 'filled')
+
+    # Find and display center of mass
+    print(center_mass(cleaned))
+    center = add_center(cleaned, 5)
+    display(center, 2000, 'Center added')
 
     # Ask user if he wishes to continue
     print("Do you want to continue the program? (yes or no)")
