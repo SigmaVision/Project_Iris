@@ -29,7 +29,9 @@ def isolate_pupil(image, threshold: int):
         for j in range(0,y):
             importance = (-((i-x_0)/x)**2+1)**2 * (-((j-y_0)/y)**2+1)**2
             filteredThreshold = int(importance * threshold)
-            if importance > 0.4 and (image[i,j][0] > filteredThreshold or image[i,j][1] > filteredThreshold or image[i,j][2] > filteredThreshold):
+            if image[i,j][0] > filteredThreshold or image[i,j][1] > filteredThreshold or image[i,j][2] > filteredThreshold:
+                image[i,j]=[255,255,255]
+            elif(importance < 0.94):
                 image[i,j]=[255,255,255]
             else:
                 image[i, j] = [0, 0, 0]
