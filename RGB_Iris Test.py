@@ -87,6 +87,14 @@ def avg_luminance(image):
     return sum // count
 
 
+def fill_pupil():
+    pass
+
+
+def shape_pupil():
+    pass
+
+
 ##########################################################
 # MAIN
 ##########################################################
