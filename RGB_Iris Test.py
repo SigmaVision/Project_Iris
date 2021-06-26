@@ -22,14 +22,12 @@ def display(image, time: int = 2000, title: str = 'Image') -> None:
 
 def isolate_pupil(image, threshold: int):
     'Binarize value based on if it is below the threshold or not'
-    # ((((i - (x // 2)) // 20) * 2) * (((j - (y // 2)) // 20) * 2))
-    x, y, c = image.shape
-    for i in range(0, x):
-        for j in range(0, y):
-            filteredThreshold = threshold
-            if not (image[i, j][0] < filteredThreshold and image[i, j][1] < filteredThreshold and image[i, j][
-                2] < filteredThreshold):
-                image[i, j] = [255, 255, 255]
+    x,y,c=image.shape
+    for i in range(0,x):
+        for j in range(0,y):
+            filteredThreshold = (-(i - (x // 2))//x*2 ** 2+1) * (-(j - (y // 2))*2//x ** 2+1) * threshold
+            if image[i,j][0] > filteredThreshold or image[i,j][1] > filteredThreshold or image[i,j][2] > filteredThreshold:
+                image[i,j]=[255,255,255]
             else:
                 image[i, j] = [0, 0, 0]
 
