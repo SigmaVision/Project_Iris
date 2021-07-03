@@ -69,9 +69,9 @@ def center_mass(image) -> tuple:
     return (sum_i // total, sum_j // total)
 
 
-def add_center(image, size: int):
-    "Returns an image with a red square around it's center of mass"
-    x, y = center_mass(image)
+def add_point(image, point:tuple,size: int):
+    "Returns an image with a red square around the specified point"
+    x,y = point
     for i in range(x - size, x + size):
         for j in range(y - size, y + size):
             image[i, j] = [0, 0, 255]
@@ -184,7 +184,7 @@ while run_program == 'yes':
 
     # Find and display center of mass
     # print(center_mass(cleaned))
-    # center = add_center(cleaned, 5)
+    # center = add_center(cleaned,center, 5)
     # display(center, 2000, 'Center added')
 
     # Find corners
