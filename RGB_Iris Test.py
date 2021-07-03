@@ -69,16 +69,16 @@ def center_mass(image) -> tuple:
     return (sum_i // total, sum_j // total)
 
 
-def add_point(image, point:tuple,size: int):
+def add_point(image, point: tuple, size: int):
     "Returns an image with a red square around the specified point"
-    x,y = point
+    x, y = point
     for i in range(x - size, x + size):
         for j in range(y - size, y + size):
             image[i, j] = [0, 0, 255]
     return image
 
 
-def find_corner(image):
+def find_corner(image) -> tuple:
     x, y, c = image.shape
     l = list()
 
@@ -89,9 +89,9 @@ def find_corner(image):
             r, g, b = image[i, j][2], image[i, j][1], image[i, j][0]
             if r == 0 and g == 0 and b == 0 and counter == 0:  # leftmost point
                 counter += 1
-                l.append((i, j))
+                l.append(i)
             elif r == 0 and g == 0 and b == 0:  # rightmost point
-                temp1 = (i, j)
+                temp1 = i
             else:
                 continue
     l.append(temp1)
@@ -103,16 +103,16 @@ def find_corner(image):
             r, g, b = image[i, j][2], image[i, j][1], image[i, j][0]
             if r == 0 and g == 0 and b == 0 and counter == 0:  # topmost point
                 counter += 1
-                l.append((i, j))
+                l.append(j)
             elif r == 0 and g == 0 and b == 0:  # bottommost point
-                temp2 = (i, j)
+                temp2 = j
             else:
                 continue
     l.append(temp2)
-    return l
+    return (l[0], l[3]), (l[1], l[2])
 
 
-def avg_luminance(image):
+def avg_luminance(image) -> int:
     sum = 0
     count = 0
     x, y, c = image.shape
@@ -122,7 +122,6 @@ def avg_luminance(image):
             brightness = (r + g + b) // 3
             sum += brightness
             count += 1
-    print(sum // count)
     return sum // count
 
 
@@ -133,16 +132,17 @@ def fill_pupil(image):
     cv.drawContours(image, contours, 1, (0, 0, 0), thickness=-1)
 
 
-def shape_pupil(image, centerX, centerY):
+def shape_pupil(image, centerX, centerY, radius):
     # need to find the radius first
-    cv.circle(image, (centerY, centerX), 25, (0, 255, 0), thickness=2)
+    cv.circle(image, (centerY, centerX), radius, (0, 255, 0), thickness=2)
 
 
 def recenter_point(bottom_left: tuple, top_right: tuple) -> tuple:
     x1, y1 = bottom_left
     x2, y2 = top_right
-    center = (int((x1+x2)/2),int((y1+y2)/2))
+    center = (int((x1 + x2) / 2), int((y1 + y2) / 2))
     return center
+
 
 def pupil_radius(bottom_left: tuple, top_right: tuple) -> int:
     x1, y1 = bottom_left
@@ -172,23 +172,33 @@ while run_program == 'yes':
     blurred = cv.medianBlur(image, 5)
     display(blurred, 2000, 'Blurred')
 
-    # clean pupil
+    # Clean pupil
     centerX, centerY = center_mass(blurred)
     cleaned = clean_pupil(blurred, centerX, centerY)
     display(cleaned, 2000, 'Cleaned')
     print(center_mass(blurred))
 
-    # fill pupil
-    # fill_pupil(cleaned)
-    # display(cleaned, 2000, 'filled')
-
-    # Find and display center of mass
-    # print(center_mass(cleaned))
-    # center = add_center(cleaned,center, 5)
-    # display(center, 2000, 'Center added')
+    # Fill pupil
+    fill_pupil(cleaned)
+    display(cleaned, 2000, 'filled')
 
     # Find corners
-    print(find_corner(cleaned))
+    corners = find_corner(cleaned)
+    print(corners)
+
+    # Recenter point
+    center = recenter_point(corners[0], corners[1])
+    print(center)
+    add_point(cleaned, center, 5)
+    display(cleaned, 2000, 'recentered')
+
+    # Find radius
+    radius = pupil_radius(corners[0], corners[1])
+    print(radius)
+
+    # shape and refill pupil
+    # shape_pupil(cleaned, center[0], center[1], radius)
+    # display(cleaned, 2000, 'final')
 
     # Ask user if he wishes to continue
     print("Do you want to continue the program? (yes or no)")
