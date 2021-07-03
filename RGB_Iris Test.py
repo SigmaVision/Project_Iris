@@ -147,7 +147,7 @@ def recenter_point(bottom_left: tuple, top_right: tuple) -> tuple:
 def pupil_radius(bottom_left: tuple, top_right: tuple) -> int:
     x1, y1 = bottom_left
     x2, y2 = top_right
-    radius = int(((x1 + x2) / 4 + (y1 + y2) / 4))
+    radius = int(((x1 - x2) / 4 + (y2 - y1) / 4))
     return radius
 
 
