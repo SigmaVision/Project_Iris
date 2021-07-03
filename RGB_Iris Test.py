@@ -98,14 +98,14 @@ def find_corner(image):
 
     counter = 0
     temp2 = (0, 0)
-    for a in range(0, y):
-        for b in range(0, x):
-            r, g, b = image[b, a][2], image[b, a][1], image[b, a][0]
+    for j in range(0, y):
+        for i in range(0, x):
+            r, g, b = image[i, j][2], image[i, j][1], image[i, j][0]
             if r == 0 and g == 0 and b == 0 and counter == 0:  # topmost point
                 counter += 1
-                l.append((b, a))
+                l.append((i, j))
             elif r == 0 and g == 0 and b == 0:  # bottommost point
-                temp2 = (b, a)
+                temp2 = (i, j)
             else:
                 continue
     l.append(temp2)
