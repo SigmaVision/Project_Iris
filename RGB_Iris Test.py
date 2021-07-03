@@ -1,4 +1,5 @@
 import cv2 as cv
+import numpy as np
 
 
 ##########################################################
@@ -22,17 +23,18 @@ def display(image, time: int = 2000, title: str = 'Image') -> None:
 
 def isolate_pupil(image, threshold: int):
     'Binarize value based on if it is below the threshold or not'
-    x,y,c=image.shape
-    x_0=x//2
-    y_0=y//2
-    for i in range(0,x):
-        for j in range(0,y):
-            importance = (-((i-x_0)/x)**2+1)**2 * (-((j-y_0)/y)**2+1)**2
+    x, y, c = image.shape
+    x_0 = x // 2
+    y_0 = y // 2
+    for i in range(0, x):
+        for j in range(0, y):
+            importance = (-((i - x_0) / x) ** 2 + 1) ** 2 * (-((j - y_0) / y) ** 2 + 1) ** 2
             filteredThreshold = int(importance * threshold)
-            if image[i,j][0] > filteredThreshold or image[i,j][1] > filteredThreshold or image[i,j][2] > filteredThreshold:
-                image[i,j]=[255,255,255]
-            elif(importance < 0.94):
-                image[i,j]=[255,255,255]
+            if image[i, j][0] > filteredThreshold or image[i, j][1] > filteredThreshold or image[i, j][
+                2] > filteredThreshold:
+                image[i, j] = [255, 255, 255]
+            elif (importance < 0.94):
+                image[i, j] = [255, 255, 255]
             else:
                 image[i, j] = [0, 0, 0]
 
@@ -74,6 +76,41 @@ def add_center(image, size: int):
         for j in range(y - size, y + size):
             image[i, j] = [0, 0, 255]
     return image
+
+
+def find_corner(image):
+    x, y, c = image.shape
+    l = list()
+
+    counter = 0
+    temp1 = (0, 0)
+
+    for i in range(0, x):
+        for j in range(0, y):
+            if (image[i, j] == [0, 0, 0]).all() and counter == 0:  # leftmost point
+                counter += 1
+                l.append((x, y))
+            elif (image[i, j] == [0, 0, 0]).all():  # rightmost point
+                temp1 = (x, y)
+    l.append(temp1)
+
+    counter = 0
+    temp2 = (0, 0)
+
+    for a in range(0, y):
+        for b in range(0, x):
+            if (image[b, a] == [0, 0, 0]).all() and counter == 0:  # topmost point
+                counter += 1
+                l.append((x, y))
+            elif (image[b, a] == [0, 0, 0]).all():  # bottommost point
+                temp2 = (x, y)
+    l.append(temp2)
+    return l
+
+
+def recenter_pupil(bottom_left: tuple, top_right: tuple):
+    x = 0
+    y = 0
 
 
 def avg_luminance(image):
@@ -149,6 +186,9 @@ while run_program == 'yes':
     print(center_mass(cleaned))
     center = add_center(cleaned, 5)
     display(center, 2000, 'Center added')
+
+    # Find corners
+    print(find_corner(image))
 
     # Ask user if he wishes to continue
     print("Do you want to continue the program? (yes or no)")
