@@ -102,6 +102,12 @@ def shape_pupil(image, centerX, centerY):
     cv.circle(image, (centerY, centerX), 25, (0, 255, 0), thickness=2)
 
 
+def recenter_point(bottom_left: tuple, top_right: tuple) -> tuple:
+    x1, y1 = bottom_left
+    x2, y2 = top_right
+    center = (int((x1+x2)/2),int((y1+y2)/2))
+    return center
+
 def pupil_radius(bottom_left: tuple, top_right: tuple) -> int:
     x1, y1 = bottom_left
     x2, y2 = top_right
