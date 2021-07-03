@@ -84,33 +84,32 @@ def find_corner(image):
 
     counter = 0
     temp1 = (0, 0)
-
     for i in range(0, x):
         for j in range(0, y):
-            if (image[i, j] == [0, 0, 0]).all() and counter == 0:  # leftmost point
+            r, g, b = image[i, j][2], image[i, j][1], image[i, j][0]
+            if r == 0 and g == 0 and b == 0 and counter == 0:  # leftmost point
                 counter += 1
-                l.append((x, y))
-            elif (image[i, j] == [0, 0, 0]).all():  # rightmost point
-                temp1 = (x, y)
+                l.append((i, j))
+            elif r == 0 and g == 0 and b == 0:  # rightmost point
+                temp1 = (i, j)
+            else:
+                continue
     l.append(temp1)
 
     counter = 0
     temp2 = (0, 0)
-
     for a in range(0, y):
         for b in range(0, x):
-            if (image[b, a] == [0, 0, 0]).all() and counter == 0:  # topmost point
+            r, g, b = image[b, a][2], image[b, a][1], image[b, a][0]
+            if r == 0 and g == 0 and b == 0 and counter == 0:  # topmost point
                 counter += 1
-                l.append((x, y))
-            elif (image[b, a] == [0, 0, 0]).all():  # bottommost point
-                temp2 = (x, y)
+                l.append((b, a))
+            elif r == 0 and g == 0 and b == 0:  # bottommost point
+                temp2 = (b, a)
+            else:
+                continue
     l.append(temp2)
     return l
-
-
-def recenter_pupil(bottom_left: tuple, top_right: tuple):
-    x = 0
-    y = 0
 
 
 def avg_luminance(image):
@@ -142,8 +141,9 @@ def shape_pupil(image, centerX, centerY):
 def pupil_radius(bottom_left: tuple, top_right: tuple) -> int:
     x1, y1 = bottom_left
     x2, y2 = top_right
-    radius = int(((x1+x2)/4+(y1+y2)/4))
+    radius = int(((x1 + x2) / 4 + (y1 + y2) / 4))
     return radius
+
 
 ##########################################################
 # MAIN
@@ -173,16 +173,16 @@ while run_program == 'yes':
     print(center_mass(blurred))
 
     # fill pupil
-    fill_pupil(cleaned)
-    display(cleaned, 2000, 'filled')
+    # fill_pupil(cleaned)
+    # display(cleaned, 2000, 'filled')
 
     # Find and display center of mass
-    print(center_mass(cleaned))
-    center = add_center(cleaned, 5)
-    display(center, 2000, 'Center added')
+    # print(center_mass(cleaned))
+    # center = add_center(cleaned, 5)
+    # display(center, 2000, 'Center added')
 
     # Find corners
-    print(find_corner(image))
+    print(find_corner(cleaned))
 
     # Ask user if he wishes to continue
     print("Do you want to continue the program? (yes or no)")
