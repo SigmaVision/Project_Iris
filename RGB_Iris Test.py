@@ -139,6 +139,12 @@ def shape_pupil(image, centerX, centerY):
     cv.circle(image, (centerY, centerX), 25, (0, 255, 0), thickness=2)
 
 
+def pupil_radius(bottom_left: tuple, top_right: tuple) -> int:
+    x1, y1 = bottom_left
+    x2, y2 = top_right
+    radius = int(((x1+x2)/4+(y1+y2)/4))
+    return radius
+
 ##########################################################
 # MAIN
 ##########################################################
