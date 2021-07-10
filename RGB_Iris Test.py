@@ -1,5 +1,4 @@
 import cv2 as cv
-import numpy as np
 
 
 ##########################################################
@@ -151,6 +150,17 @@ def pupil_radius(bottom_left: tuple, top_right: tuple) -> int:
     return radius
 
 
+def iris_radius(image, pupil_center: tuple, pupil_radius: int, threshold: int) -> int:
+    x = pupil_center[0] - pupil_radius
+    edge = False
+    while not edge and x != 0:
+        r, g, b = image[x, pupil_center[1]][2], image[x, pupil_center[1]][1], image[x, pupil_center[1]][0]
+        if r >= threshold or g >= threshold or b >= threshold:
+            edge = True
+        x -= 1
+    return pupil_center[0] - x + pupil_radius
+
+
 ##########################################################
 # MAIN
 ##########################################################
@@ -162,6 +172,7 @@ while run_program == 'yes':
     print("Which image do you want to process?")
     name = input().strip()
     image = read_image(name)
+    original = read_image(name)
 
     # Binarize based on Threshold
     threshold = avg_luminance(image)
@@ -192,13 +203,22 @@ while run_program == 'yes':
     add_point(cleaned, center, 5)
     display(cleaned, 2000, 'recentered')
 
-    # Find radius
+    # Find pupil radius
     radius = pupil_radius(corners[0], corners[1])
-    print(radius)
+    print('Pupil rad = ', radius)
 
-    # shape and refill pupil
-    # shape_pupil(cleaned, center[0], center[1], radius)
-    # display(cleaned, 2000, 'final')
+    # Find iris radius
+    t = 255 - threshold
+    iris_rad = iris_radius(image, center, radius, t)
+    print("Iris rad = ", iris_rad)
+
+    # Shape pupil
+    shape_pupil(original, center[0], center[1], radius)
+    display(original, 2000, 'pupil')
+
+    # Shape iris
+    shape_pupil(original, center[0], center[1], iris_rad)
+    display(original, 2000, 'iris')
 
     # Ask user if he wishes to continue
     print("Do you want to continue the program? (yes or no)")
