@@ -18,31 +18,39 @@ def display(image, time: int = 2000, title: str = 'Image') -> None:
     # cv.destroyWindow(title)
 
 
-# Review
 def isolate_pupil(image, threshold: int):
     'Returns a binarized version of the image value based on if it is below a threshold or not'
     x, y, c = image.shape
     x_0 = x // 2
     y_0 = y // 2
+
+    counter = 0
+    original_image = image.copy()
+
     for i in range(0, x):
         for j in range(0, y):
-            importance = (-((i - x_0) / x) ** 2 + 1) ** 2 * (-((j - y_0) / y) ** 2 + 1) ** 2
+            importance = (-((i - x_0) / x) ** 2 + 1) * (-((j - y_0) / y) ** 2 + 1)
             filteredThreshold = int(importance * threshold)
-            if image[i, j][0] > filteredThreshold or image[i, j][1] > filteredThreshold or image[i, j][
-                2] > filteredThreshold:
+            if (importance < 0.92):
                 image[i, j] = [255, 255, 255]
-            elif (importance < 0.94):
+            elif image[i, j][0] > filteredThreshold or image[i, j][1] > filteredThreshold or image[i, j][2] > filteredThreshold:
                 image[i, j] = [255, 255, 255]
             else:
                 image[i, j] = [0, 0, 0]
+                counter += 1
+
+    if counter < 20:
+           image = isolate_pupil(original_image, threshold*2)
+
     return image
 
 
-# Review
+
+
 def whiten_region(image, centerX: int, centerY: int):
     "Returns the image after all pixels that are too far from the approximate center point of the pupil are whitened"
     x, y, c = image.shape
-    random_range = 43  # number of pixels away from the approximate center point of the pupil. Implement dynamically.
+    random_range = 35  # Chosen cuz it made sense and it worked. Just don't question it ¯\_(ツ)_/¯
     for i in range(0, x):
         for j in range(0, y):
             if abs(i - centerX) > random_range or abs(j - centerY) > random_range:
@@ -123,7 +131,7 @@ def average_luminance(image) -> int:
             brightness = (r + g + b) // 3
             sum += brightness
             count += 1
-    return sum // count
+    return sum // count /2
 
 
 def fill_pupil(image) -> None:
@@ -192,7 +200,8 @@ def p1_identify_regions():
         display(binarized, 2000, 'After Binarization')
 
         # Median blur to remove noise
-        blurred = cv.medianBlur(image, 7)
+
+        blurred = cv.medianBlur(binarized, 7)
         display(blurred, 2000, 'Blurred')
 
         # Find approximate center of mass of the pupil region
@@ -261,10 +270,10 @@ def p1_only_details():
         print('Average luminance - threshold value:', threshold, 'RGB')
 
         # Binarize image based on threshold
-        isolate_pupil(image, threshold)
+        binarized = isolate_pupil(image, threshold)
 
         # Median blur to remove noise
-        blurred = cv.medianBlur(image, 7)
+        blurred = cv.medianBlur(binarized, 7)
 
         # Find approximate center of mass of the pupil region
         centerX, centerY = center_mass(blurred)
