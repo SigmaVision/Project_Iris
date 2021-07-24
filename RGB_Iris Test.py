@@ -18,7 +18,6 @@ def display(image, time: int = 2000, title: str = 'Image') -> None:
     # cv.destroyWindow(title)
 
 
-# Review
 def isolate_pupil(image, threshold: int):
     'Returns a binarized version of the image value based on if it is below a threshold or not'
     x, y, c = image.shape
@@ -49,7 +48,7 @@ def isolate_pupil(image, threshold: int):
 def whiten_region(image, centerX, centerY):
     "Returns the image after all pixels that are too far from the approximate center point of the pupil are whitened"
     x, y, c = image.shape
-    random_range = 43  # number of pixels away from the approximate center point of the pupil. Implement dynamically.
+    random_range = 35  # Chosen cuz it made sense and it worked. Just don't question it ¯\_(ツ)_/¯
     for i in range(0, x):
         for j in range(0, y):
             if abs(i - centerX) > random_range or abs(j - centerY) > random_range:
@@ -199,7 +198,7 @@ def p1_identify_regions():
         display(binarized, 2000, 'After Binarization')
 
         # Median blur to remove noise
-        blurred = cv.medianBlur(image, 5)
+        blurred = cv.medianBlur(binarized, 7)
         display(blurred, 2000, 'Blurred')
 
         # Find approximate center of mass of the pupil region
@@ -268,10 +267,10 @@ def p1_only_details():
         print('Average luminance - threshold value:', threshold, 'RGB')
 
         # Binarize image based on threshold
-        isolate_pupil(image, threshold)
+        binarized = isolate_pupil(image, threshold)
 
         # Median blur to remove noise
-        blurred = cv.medianBlur(image, 5)
+        blurred = cv.medianBlur(binarized, 7)
 
         # Find approximate center of mass of the pupil region
         centerX, centerY = center_mass(blurred)
@@ -308,5 +307,5 @@ def p1_only_details():
 # MAIN
 ##########################################################
 
-# p1_identify_regions()
+p1_identify_regions()
 # p1_only_details()
