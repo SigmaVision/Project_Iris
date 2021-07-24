@@ -45,7 +45,9 @@ def isolate_pupil(image, threshold: int):
     return image
 
 
-def whiten_region(image, centerX, centerY):
+
+
+def whiten_region(image, centerX: int, centerY: int):
     "Returns the image after all pixels that are too far from the approximate center point of the pupil are whitened"
     x, y, c = image.shape
     random_range = 35  # Chosen cuz it made sense and it worked. Just don't question it ¯\_(ツ)_/¯
@@ -198,6 +200,7 @@ def p1_identify_regions():
         display(binarized, 2000, 'After Binarization')
 
         # Median blur to remove noise
+
         blurred = cv.medianBlur(binarized, 7)
         display(blurred, 2000, 'Blurred')
 
