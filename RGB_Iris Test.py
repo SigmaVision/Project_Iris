@@ -175,6 +175,20 @@ def iris_radius(image, pupil_center: tuple, pupil_radius: int, threshold: int) -
     return pupil_center[0] - x + pupil_radius
 
 
+def yassine_iris_radius(image, pupil_center: tuple, pupil_radius: int) -> int:
+    "Returns the radius of the iris region"
+    memory = []
+    iris_radius = 0
+    area_right = image[pupil_center[0]+pupil_radius+iris_radius:pupil_center[0]+pupil_radius+iris_radius+5,pupil_center[1]]
+    area_left = image[pupil_center[0]-pupil_radius-iris_radius:pupil_center[0]-pupil_radius-iris_radius-5,pupil_center[1]]
+    # for 3 rounds just cumulate the difference
+        # Calculate the diff and store it in memory
+        # increase iris radius +4
+    # while diff is close to the average of the diff, increase iris radius +1
+    # I will need to define "close" and what is "close enough"
+    return iris_radius
+
+    
 def p1_identify_regions():
     "Part 1 -  Prints details and outputs the utilized identification process for the pupil and iris regions of an eye"
     run_program = 'yes'
