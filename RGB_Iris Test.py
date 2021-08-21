@@ -33,18 +33,17 @@ def isolate_pupil(image, threshold: int):
             filteredThreshold = int(importance * threshold)
             if (importance < 0.92):
                 image[i, j] = [255, 255, 255]
-            elif image[i, j][0] > filteredThreshold or image[i, j][1] > filteredThreshold or image[i, j][2] > filteredThreshold:
+            elif image[i, j][0] > filteredThreshold or image[i, j][1] > filteredThreshold or image[i, j][
+                2] > filteredThreshold:
                 image[i, j] = [255, 255, 255]
             else:
                 image[i, j] = [0, 0, 0]
                 counter += 1
 
     if counter < 20:
-           image = isolate_pupil(original_image, threshold*2)
+        image = isolate_pupil(original_image, threshold * 2)
 
     return image
-
-
 
 
 def whiten_region(image, centerX: int, centerY: int):
@@ -131,7 +130,7 @@ def average_luminance(image) -> int:
             brightness = (r + g + b) // 3
             sum += brightness
             count += 1
-    return sum // count /2
+    return sum // count / 2
 
 
 def fill_pupil(image) -> None:
@@ -167,6 +166,7 @@ def iris_radius(image, pupil_center: tuple, pupil_radius: int) -> int:
     "Returns the radius of the iris region"
     image = cv.medianBlur(image, 7)
     memory = []
+
     class Elem:
         def __init__(self, image, x, y, length):
             self.x = x
@@ -176,28 +176,28 @@ def iris_radius(image, pupil_center: tuple, pupil_radius: int) -> int:
             for i in range(length):
                 r, g, b = image[y, i][2], image[y, i][1], image[y, i][0]
                 temp.append((r + g + b) // 3)
-            self.contrast = max(temp)-min(temp)
-    
+            self.contrast = max(temp) - min(temp)
+
     for i in range(10):
         y = pupil_center[0]
-        x = pupil_center[1]+pupil_radius+5
-        memory.append(Elem(image,x,y,5))
+        x = pupil_center[1] + pupil_radius + 5
+        memory.append(Elem(image, x, y, 5))
         x += 5
 
-    current_max = Elem(image,pupil_center[0],pupil_center[1],5)
+    current_max = Elem(image, pupil_center[0], pupil_center[1], 5)
     for elem in memory:
         if elem.contrast > current_max.contrast:
             current_max = elem
 
-    iris_radius = current_max.x-pupil_center[1]
-    return abs(iris_radius)+pupil_radius
-
+    iris_radius = current_max.x - pupil_center[1]
+    return abs(iris_radius) + pupil_radius
 
 
 def yassine_iris_radius(image, pupil_center: tuple, pupil_radius: int) -> int:
     "Returns the radius of the iris region"
     image = cv.medianBlur(image, 7)
     memory = []
+
     class Elem:
         def __init__(self, image, x, y, length):
             self.x = x
@@ -208,23 +208,26 @@ def yassine_iris_radius(image, pupil_center: tuple, pupil_radius: int) -> int:
                 r, g, b = image[y, i][2], image[y, i][1], image[y, i][0]
                 temp.append((r + g + b) // 3)
             self.contrast = max(temp)
-    
+
     for i in range(10):
         y = pupil_center[0]
-        x = pupil_center[1]+pupil_radius+5
-        memory.append(Elem(image,x,y,5))
+        x = pupil_center[1] + pupil_radius + 5
+        memory.append(Elem(image, x, y, 5))
         x += 5
 
-    current_max = Elem(image,pupil_center[0],pupil_center[1],5)
+    current_max = Elem(image, pupil_center[0], pupil_center[1], 5)
     for i in range(len(memory)):
-        contrast_diff = memory[i-1]
-        if elem.contrast > current_max.contrast:
-            current_max = elem
+        if i == 0:
+            continue
+        else:
+            contrast_diff = memory[i - 1].contrast - memory[i].contrast
+            if contrast_diff < current_max.contrast:
+                current_max = memory[i]
 
-    iris_radius = current_max.x-pupil_center[1]
-    return abs(iris_radius)+pupil_radius
+    iris_radius = current_max.x - pupil_center[1]
+    return abs(iris_radius) + pupil_radius
 
-    
+
 def p1_identify_regions():
     "Part 1 -  Prints details and outputs the utilized identification process for the pupil and iris regions of an eye"
     run_program = 'yes'
@@ -292,7 +295,7 @@ def p1_identify_regions():
         # print("Iris radius =", iris_rad, 'pixels')
 
         iris = yassine_iris_radius(read_image(name), center, radius)
-        print("Iris radius =",iris, " pixels")
+        print("Iris radius =", iris, " pixels")
 
         # Circles the iris region on the original image
         circle_region(original_image, center[0], center[1], iris)
@@ -358,6 +361,7 @@ def p1_only_details():
         # Ask user if he wishes to continue and repeat the process
         print("Do you want to continue the program? (yes or no)")
         run_program = input().strip()
+
 
 ##########################################################
 # MAIN
