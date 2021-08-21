@@ -163,30 +163,66 @@ def pupil_radius(bottom_left: tuple, top_right: tuple) -> int:
     return radius
 
 
-def iris_radius(image, pupil_center: tuple, pupil_radius: int, threshold: int) -> int:
+def iris_radius(image, pupil_center: tuple, pupil_radius: int) -> int:
     "Returns the radius of the iris region"
-    x = pupil_center[0] - pupil_radius
-    edge = False
-    while not edge and x != 0:
-        r, g, b = image[x, pupil_center[1]][2], image[x, pupil_center[1]][1], image[x, pupil_center[1]][0]
-        if r >= threshold or g >= threshold or b >= threshold:
-            edge = True
-        x -= 1
-    return pupil_center[0] - x + pupil_radius
+    image = cv.medianBlur(image, 7)
+    memory = []
+    class Elem:
+        def __init__(self, image, x, y, length):
+            self.x = x
+            self.y = y
+            self.length = length
+            temp = []
+            for i in range(length):
+                r, g, b = image[y, i][2], image[y, i][1], image[y, i][0]
+                temp.append((r + g + b) // 3)
+            self.contrast = max(temp)-min(temp)
+    
+    for i in range(10):
+        y = pupil_center[0]
+        x = pupil_center[1]+pupil_radius+5
+        memory.append(Elem(image,x,y,5))
+        x += 5
+
+    current_max = Elem(image,pupil_center[0],pupil_center[1],5)
+    for elem in memory:
+        if elem.contrast > current_max.contrast:
+            current_max = elem
+
+    iris_radius = current_max.x-pupil_center[1]
+    return abs(iris_radius)+pupil_radius
+
 
 
 def yassine_iris_radius(image, pupil_center: tuple, pupil_radius: int) -> int:
     "Returns the radius of the iris region"
+    image = cv.medianBlur(image, 7)
     memory = []
-    iris_radius = 0
-    area_right = image[pupil_center[0]+pupil_radius+iris_radius:pupil_center[0]+pupil_radius+iris_radius+5,pupil_center[1]]
-    area_left = image[pupil_center[0]-pupil_radius-iris_radius:pupil_center[0]-pupil_radius-iris_radius-5,pupil_center[1]]
-    # for 3 rounds just cumulate the difference
-        # Calculate the diff and store it in memory
-        # increase iris radius +4
-    # while diff is close to the average of the diff, increase iris radius +1
-    # I will need to define "close" and what is "close enough"
-    return iris_radius
+    class Elem:
+        def __init__(self, image, x, y, length):
+            self.x = x
+            self.y = y
+            self.length = length
+            temp = []
+            for i in range(length):
+                r, g, b = image[y, i][2], image[y, i][1], image[y, i][0]
+                temp.append((r + g + b) // 3)
+            self.contrast = max(temp)
+    
+    for i in range(10):
+        y = pupil_center[0]
+        x = pupil_center[1]+pupil_radius+5
+        memory.append(Elem(image,x,y,5))
+        x += 5
+
+    current_max = Elem(image,pupil_center[0],pupil_center[1],5)
+    for i in range(len(memory)):
+        contrast_diff = memory[i-1]
+        if elem.contrast > current_max.contrast:
+            current_max = elem
+
+    iris_radius = current_max.x-pupil_center[1]
+    return abs(iris_radius)+pupil_radius
 
     
 def p1_identify_regions():
@@ -246,17 +282,20 @@ def p1_identify_regions():
         radius = pupil_radius(corners[0], corners[1])
         print('Pupil radius =', radius, 'pixels')
 
-        # Find radius of the iris region
-        thresh = 255 - threshold
-        iris_rad = iris_radius(image, center, radius, thresh)
-        print("Iris radius =", iris_rad, 'pixels')
-
         # Circles the pupil region on the original image
         circle_region(original_image, center[0], center[1], radius)
         display(original_image, 2000, 'pupil')
 
+        # Find radius of the iris region
+        # thresh = 255 - threshold
+        # iris_rad = iris_radius(image, center, radius, thresh)
+        # print("Iris radius =", iris_rad, 'pixels')
+
+        iris = yassine_iris_radius(read_image(name), center, radius)
+        print("Iris radius =",iris, " pixels")
+
         # Circles the iris region on the original image
-        circle_region(original_image, center[0], center[1], iris_rad)
+        circle_region(original_image, center[0], center[1], iris)
         display(original_image, 2000, 'iris')
 
         # Ask user if he wishes to continue and repeat the process
