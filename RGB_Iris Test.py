@@ -171,20 +171,25 @@ def iris_radius(image, pupil_center: tuple, pupil_radius: int) -> int:
         def __init__(self, image, x, y, length):
             self.x = x
             self.y = y
-            self.length = length
+            self.length = abs(length)
             temp = []
             for i in range(length):
-                r, g, b = image[y, i][2], image[y, i][1], image[y, i][0]
+                r, g, b = image[y, x+i][2], image[y, x+i][1], image[y, x+i][0]
                 temp.append((r + g + b) // 3)
             self.contrast = max(temp) - min(temp)
+            self.isRight = temp.index(max(temp))>temp.index(min(temp))
 
-    for i in range(10):
+    length = 5
+    for i in range(13):
         y = pupil_center[0]
-        x = pupil_center[1] + pupil_radius + 5
-        memory.append(Elem(image, x, y, 5))
-        x += 5
+        x = pupil_center[1] + pupil_radius + length
+        hll = Elem(image, x, y, length)
+        if hll.isRight:
+            memory.append(hll)
+        x += length
 
-    current_max = Elem(image, pupil_center[0], pupil_center[1], 5)
+
+    current_max = Elem(image, pupil_center[0], pupil_center[1], length)
     for elem in memory:
         if elem.contrast > current_max.contrast:
             current_max = elem
@@ -209,7 +214,7 @@ def yassine_iris_radius(image, pupil_center: tuple, pupil_radius: int) -> int:
                 temp.append((r + g + b) // 3)
             self.contrast = max(temp)
 
-    for i in range(10):
+    for i in range(1):
         y = pupil_center[0]
         x = pupil_center[1] + pupil_radius + 5
         memory.append(Elem(image, x, y, 5))
@@ -294,7 +299,7 @@ def p1_identify_regions():
         # iris_rad = iris_radius(image, center, radius, thresh)
         # print("Iris radius =", iris_rad, 'pixels')
 
-        iris = yassine_iris_radius(read_image(name), center, radius)
+        iris = iris_radius(read_image(name), center, radius)
         print("Iris radius =", iris, " pixels")
 
         # Circles the iris region on the original image
