@@ -172,6 +172,31 @@ def isolate_iris(image, alpha: float, beta: int):
     return new_image
 
 
+def simon_iris_radius(image, pupil_center: tuple, pupil_radius: int) -> int:
+    image = isolate_iris(cv.medianBlur(image, 7), 1.2, 50)
+    y = pupil_center[0]
+    x = pupil_center[1] + pupil_radius
+    past_bright = 0
+    current_bright = 0
+    highest_recorded = (0, 0)
+    for i in range(60):
+        if i < 30:
+            x += 1
+        elif i == 31:
+            r1, g1, b1 = image[y, x][2], image[y, x][1], image[y, x][0]
+            past_bright = r1 + g1 + b1
+            x += 1
+        else:
+            r2, g2, b2 = image[y, x][2], image[y, x][1], image[y, x][0]
+            current_bright = r2 + g2 + b2
+            difference = current_bright - past_bright
+            if difference > highest_recorded[0]:
+                highest_recorded = (difference, x)
+            past_bright = current_bright
+    return abs(highest_recorded[1] - pupil_center[1])
+
+
+
 def iris_radius(image, pupil_center: tuple, pupil_radius: int) -> int:
     "Returns the radius of the iris region"
     image = isolate_iris(cv.medianBlur(image, 7), 1.2, 50)
@@ -190,9 +215,9 @@ def iris_radius(image, pupil_center: tuple, pupil_radius: int) -> int:
             self.isRight = temp.index(max(temp))>temp.index(min(temp))
 
     length = 5
+    x = pupil_center[1] + pupil_radius
     for i in range(13):
         y = pupil_center[0]
-        x = pupil_center[1] + pupil_radius + length
         hll = Elem(image, x, y, length)
         if hll.isRight:
             memory.append(hll)
@@ -240,7 +265,7 @@ def yassine_iris_radius(image, pupil_center: tuple, pupil_radius: int) -> int:
                 current_max = memory[i]
 
     iris_radius = current_max.x - pupil_center[1]
-    return abs(iris_radius) + pupil_radius
+    return abs(iris_radius)
 
 
 def p1_identify_regions():
