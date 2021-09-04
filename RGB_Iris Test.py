@@ -1,4 +1,5 @@
 import cv2 as cv
+import numpy as np
 
 
 ##########################################################
@@ -162,9 +163,18 @@ def pupil_radius(bottom_left: tuple, top_right: tuple) -> int:
     return radius
 
 
+def isolate_iris(image, alpha: float, beta: int):
+    new_image = np.zeros(image.shape, image.dtype)
+    for y in range(image.shape[0]):
+        for x in range(image.shape[1]):
+            for c in range(image.shape[2]):
+                new_image[y, x, c] = np.clip(alpha * image[y, x, c] + beta, 0, 255)
+    return new_image
+
+
 def iris_radius(image, pupil_center: tuple, pupil_radius: int) -> int:
     "Returns the radius of the iris region"
-    image = cv.medianBlur(image, 7)
+    image = isolate_iris(cv.medianBlur(image, 7), 1.2, 50)
     memory = []
 
     class Elem:
