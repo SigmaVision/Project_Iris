@@ -334,7 +334,7 @@ def p1_identify_regions():
         # iris_rad = iris_radius(image, center, radius, thresh)
         # print("Iris radius =", iris_rad, 'pixels')
 
-        iris = iris_radius(read_image(name), center, radius)
+        iris = simon_iris_radius(read_image(name), center, radius)
         print("Iris radius =", iris, " pixels")
 
         # Circles the iris region on the original image
@@ -394,8 +394,7 @@ def p1_only_details():
         print('Pupil radius =', radius, 'pixels')
 
         # Find radius of the iris region
-        thresh = 255 - threshold
-        iris_rad = iris_radius(image, center, radius, thresh)
+        iris_rad = simon_iris_radius(image, center, radius)
         print("Iris radius =", iris_rad, 'pixels')
 
         # Ask user if he wishes to continue and repeat the process
